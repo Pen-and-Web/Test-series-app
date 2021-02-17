@@ -1,0 +1,1 @@
+export const SETLOGIN_STATUS = 'App/SETLOGIN_STATUS';

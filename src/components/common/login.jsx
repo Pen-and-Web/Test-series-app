@@ -1,4 +1,5 @@
-import React from "react";
+import { login } from "./../../services/authService";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
 import Input from "@material-ui/core/Input";
@@ -13,6 +14,12 @@ import FormControl from "@material-ui/core/FormControl";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import Visibility from "@material-ui/icons/Visibility";
 import Typography from "@material-ui/core/Typography";
+import { useHistory } from "react-router";
+import { NavLink } from "react-router-dom";
+import {
+  setUserLocalStorage,
+  getUserLocalStorage,
+} from "./../../services/authService";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -28,19 +35,29 @@ const useStyles = makeStyles((theme) => ({
       width: "35ch",
     },
   },
-  registerBtn: {
+  loginBtn: {
     padding: "8px 0",
     marginTop: "5%",
   },
   errorText: {
     color: "#f44336",
   },
+  loginLink: {
+    color: "#fff",
+    textDecoration: "none",
+  },
 }));
 
-export default function Login() {
+export default function Login({ onLogin }) {
+  useEffect(() => {
+    if (getUserLocalStorage()) {
+      history.push("/");
+    }
+  }, []);
+
   const classes = useStyles();
 
-  const [values, setValues] = React.useState({
+  const [values, setValues] = useState({
     data: {
       password: "",
       email: "",
@@ -48,6 +65,8 @@ export default function Login() {
     showPassword: false,
     errors: {},
   });
+
+  const history = useHistory();
 
   // Login validation schema for Joi
   const loginSchema = {
@@ -72,13 +91,25 @@ export default function Login() {
   };
 
   // handles login form submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validate();
     setValues({ ...values, errors: errors || {} });
     if (errors) return;
 
-    // Call the server...
+    // Login user here...
+
+    try {
+      const { user } = await login(values.data);
+      onLogin(user);
+      if (user) {
+        setUserLocalStorage(user);
+        // Redirect user to home page
+        history.push("/");
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   // validates single property
@@ -165,14 +196,17 @@ export default function Login() {
             {/* Login button */}
             <Button
               size="small"
-              className={classes.registerBtn}
+              className={classes.loginBtn}
               variant="contained"
               color="primary"
-              onClick={handleSubmit}
+              onClick={(e) => {
+                handleSubmit(e);
+              }}
             >
               Login
             </Button>
           </form>
+          <NavLink to="/">Forgot Password</NavLink>
         </CardContent>
       </Card>
     </div>

@@ -2,7 +2,6 @@ import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
-import CardHeader from "@material-ui/core/CardHeader";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import Input from "@material-ui/core/Input";
@@ -14,6 +13,7 @@ import FormControl from "@material-ui/core/FormControl";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import Visibility from "@material-ui/icons/Visibility";
 import Typography from "@material-ui/core/Typography";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme) => ({
     "& > *": {
       margin: theme.spacing(1),
       width: "35ch",
+      // maxWidth: "332px",
     },
   },
   registerBtn: {
@@ -35,6 +36,10 @@ const useStyles = makeStyles((theme) => ({
   },
   errorText: {
     color: "#f44336",
+  },
+  registerLink: {
+    color: "#fff",
+    textDecoration: "none",
   },
 }));
 
@@ -80,15 +85,33 @@ export default function Register() {
   };
 
   // handles resgister form submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validate();
     setValues({ ...values, errors: errors || {} });
     if (errors) return;
 
     // Call the server...
+    try {
+      // NOTE: Must change passwordConfirm with confirmPassword on client side
+      const { confirmPassword, ...dto } = values.data;
+      dto.passwordConfirm = confirmPassword;
+
+      console.log(dto);
+
+      const { data } = await axios.post(
+        `http://localhost:3100/api/auth/signup`,
+        dto
+      );
+      if (data) {
+        console.log(data);
+      }
+    } catch (err) {
+      console.log(err, "error occured");
+    }
   };
 
+  // To Validate single input field
   const validateProperty = ({ name, value }) => {
     const schema = { [name]: registerSchema[name] };
     const obj = { [name]: value };
@@ -96,6 +119,7 @@ export default function Register() {
     return error ? error.details[0].message : null;
   };
 
+  // Validates and updates state as soon as user types in text field
   const handleChange = ({ currentTarget: input }) => {
     const { errors, data } = values;
 
@@ -106,9 +130,12 @@ export default function Register() {
     setValues({ ...values, data, errors });
   };
 
+  // Toggles password visibility
   const handleClickShowPassword = () => {
     setValues({ ...values, showPassword: !values.showPassword });
   };
+
+  // Toggles password confirm visibility
   const handleClickShowConfirmPassword = () => {
     setValues({ ...values, showConfirmPassword: !values.showConfirmPassword });
   };
@@ -228,7 +255,9 @@ export default function Register() {
             className={classes.registerBtn}
             variant="contained"
             color="primary"
-            onClick={handleSubmit}
+            onClick={(e) => {
+              handleSubmit(e);
+            }}
           >
             Register
           </Button>

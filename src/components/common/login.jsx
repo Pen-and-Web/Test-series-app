@@ -1,5 +1,6 @@
 import { login } from "./../../services/authService";
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import { makeStyles } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
 import Input from "@material-ui/core/Input";
@@ -16,10 +17,7 @@ import Visibility from "@material-ui/icons/Visibility";
 import Typography from "@material-ui/core/Typography";
 import { useHistory } from "react-router";
 import { NavLink } from "react-router-dom";
-import {
-  setUserLocalStorage,
-  getUserLocalStorage,
-} from "./../../services/authService";
+import { getUserLocalStorage } from "./../../services/authService";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -49,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Login({ onLogin }) {
+  const history = useHistory();
   useEffect(() => {
     if (getUserLocalStorage()) {
       history.push("/");
@@ -65,8 +64,6 @@ export default function Login({ onLogin }) {
     showPassword: false,
     errors: {},
   });
-
-  const history = useHistory();
 
   // Login validation schema for Joi
   const loginSchema = {
@@ -100,15 +97,21 @@ export default function Login({ onLogin }) {
     // Login user here...
 
     try {
-      const { user } = await login(values.data);
-      onLogin(user);
-      if (user) {
-        setUserLocalStorage(user);
+      // NOTE: change dto with values.data
+      const dto = {
+        email: "john4@gmail.com",
+        password: "pass@123",
+      };
+      const res = await login(dto);
+
+      if (res) {
+        onLogin();
         // Redirect user to home page
         history.push("/");
       }
-    } catch (err) {
-      console.log(err);
+    } catch (ex) {
+      toast.error("Something went wrong ");
+      console.log(ex);
     }
   };
 

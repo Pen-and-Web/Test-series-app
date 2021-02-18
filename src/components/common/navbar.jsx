@@ -50,7 +50,7 @@ export default function Navbar({ user, onLogout }) {
             <>
               {" "}
               <NavLink color="inherit" to="/profile" className={classes.link}>
-                {user.username}
+                {user.firstName}
               </NavLink>
               <NavLink
                 color="inherit"

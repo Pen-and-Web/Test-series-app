@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { toast } from "react-toastify";
+import { useHistory } from "react-router";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
@@ -13,7 +15,11 @@ import FormControl from "@material-ui/core/FormControl";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import Visibility from "@material-ui/icons/Visibility";
 import Typography from "@material-ui/core/Typography";
-import axios from "axios";
+import {
+  getUserLocalStorage,
+  setUserLocalStorage,
+  signup,
+} from "./../../services/authService";
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -27,7 +33,6 @@ const useStyles = makeStyles((theme) => ({
     "& > *": {
       margin: theme.spacing(1),
       width: "35ch",
-      // maxWidth: "332px",
     },
   },
   registerBtn: {
@@ -43,12 +48,20 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Register() {
+export default function Register({ onSignup }) {
+  const history = useHistory();
   const classes = useStyles();
+
+  useEffect(() => {
+    if (getUserLocalStorage()) {
+      history.push("/");
+    }
+  }, []);
 
   const [values, setValues] = React.useState({
     data: {
-      username: "",
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -59,7 +72,8 @@ export default function Register() {
   });
 
   const registerSchema = {
-    username: Joi.string().required().min(3).label("Username"),
+    firstName: Joi.string().required().min(3).label("First Name"),
+    lastName: Joi.string().required().min(3).label("Last Name"),
     email: Joi.string()
       .required()
       .email({ minDomainSegments: 2 })
@@ -87,27 +101,35 @@ export default function Register() {
   // handles resgister form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const errors = validate();
     setValues({ ...values, errors: errors || {} });
     if (errors) return;
 
     // Call the server...
     try {
-      // NOTE: Must change passwordConfirm with confirmPassword on client side
-      const { confirmPassword, ...dto } = values.data;
+      // NOTE: changed passwordConfirm to confirmPassword (server demand)
+      let { confirmPassword, ...dto } = values.data;
       dto.passwordConfirm = confirmPassword;
 
-      console.log(dto);
+      // dto = {
+      //   firstName: "john",
+      //   lastName: "doe",
+      //   email: "john20@gmail.com",
+      //   password: "pass@123",
+      //   passwordConfirm: "pass@123",
+      // };
 
-      const { data } = await axios.post(
-        `http://localhost:3100/api/auth/signup`,
-        dto
-      );
-      if (data) {
-        console.log(data);
+      const res = await signup(dto);
+      if (res) {
+        setUserLocalStorage({ firstName: dto.firstName, email: dto.email });
+
+        onSignup();
+        history.push("/");
       }
-    } catch (err) {
-      console.log(err, "error occured");
+    } catch (ex) {
+      console.log(ex);
+      toast.error("Something went wrong");
     }
   };
 
@@ -147,14 +169,14 @@ export default function Register() {
           Register
         </Typography>
         <form className={classes.form} noValidate autoComplete="off">
-          {/* Username */}
+          {/* First Name */}
           <FormControl>
-            <InputLabel htmlFor="username">Username</InputLabel>
+            <InputLabel htmlFor="firstName">First Name</InputLabel>
             <Input
-              id="username"
-              name="username"
-              error={!!values.errors.username}
-              value={values.data.username}
+              id="firstName"
+              name="firstName"
+              error={!!values.errors.firstName}
+              value={values.data.firstName}
               onChange={handleChange}
               aria-describedby="component-error-text"
             />
@@ -162,7 +184,25 @@ export default function Register() {
               className={classes.errorText}
               id="component-error-text"
             >
-              {values.errors.username}
+              {values.errors.firstName}
+            </FormHelperText>
+          </FormControl>
+          {/* Last Name */}
+          <FormControl>
+            <InputLabel htmlFor="lastName">Last Name</InputLabel>
+            <Input
+              id="lastName"
+              name="lastName"
+              error={!!values.errors.lastName}
+              value={values.data.lastName}
+              onChange={handleChange}
+              aria-describedby="component-error-text"
+            />
+            <FormHelperText
+              className={classes.errorText}
+              id="component-error-text"
+            >
+              {values.errors.lastName}
             </FormHelperText>
           </FormControl>
 

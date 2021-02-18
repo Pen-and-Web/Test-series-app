@@ -2,6 +2,8 @@ import "./App.css";
 import React, { useState, useEffect } from "react";
 
 import { Route, Switch, Redirect } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Register from "./components/common/register";
 import Login from "./components/common/login";
 import Navbar from "./components/common/navbar";
@@ -23,22 +25,26 @@ function App() {
     logout();
   };
 
-  const handleLogin = (user) => {
-    setUser(user);
+  const setCurrentUser = () => {
+    setUser(getUserLocalStorage());
   };
 
   return (
     <div className="App">
+      <ToastContainer />
       <Navbar user={user} onLogout={handleLogout} />
       <Switch>
         <Redirect exact from="/" to="/home" />
 
         <ProtectedRoute path="/home" exact component={Home} />
 
-        <Route path="/register" component={Register} />
+        <Route
+          path="/register"
+          render={(props) => <Register {...props} onSignup={setCurrentUser} />}
+        />
         <Route
           path="/login"
-          render={(props) => <Login {...props} onLogin={handleLogin} />}
+          render={(props) => <Login {...props} onLogin={setCurrentUser} />}
         />
 
         <Route path="/test" component={Test} />

@@ -15,10 +15,8 @@ import FormControl from '@material-ui/core/FormControl';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import Visibility from '@material-ui/icons/Visibility';
 import Typography from '@material-ui/core/Typography';
-import { updateProfile } from '../services/authService';
-import axios from 'axios';
-import { apiUrl } from '../services/authService';
-import { getUserLocalStorage } from '../services/authService';
+import { resetPassword } from './../services/authService';
+
 const useStyles = makeStyles((theme) => ({
   card: {
     maxWidth: 400,
@@ -46,40 +44,24 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Profile({ onSignup }) {
+export default function Reset() {
+  const history = useHistory();
   const classes = useStyles();
+
   const [values, setValues] = React.useState({
     data: {
-      firstName: '',
-      lastName: '',
       password: '',
+      confirmPassword: '',
     },
     showPassword: false,
+    showConfirmPassword: false,
     errors: {},
   });
-  const history = useHistory();
 
-  const fetchProfileData = async () => {
-    try {
-      const res = await getUserLocalStorage();
-      const { data } = values;
-      console.log(res);
-      data.firstName = res.firstName;
-      data.lastName = res.lastName;
-
-      setValues({ ...values, data });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  React.useEffect(() => {
-    fetchProfileData();
-  }, []);
   const registerSchema = {
-    firstName: Joi.string().required().min(3).label('First Name'),
-    lastName: Joi.string().required().min(3).label('Last Name'),
+    code: Joi.string().required().min(6).label('Code'),
     password: Joi.string().required().min(5).label('Password'),
+    confirmPassword: Joi.string().required().min(5).label('Confirm Password'),
   };
 
   let validate = () => {
@@ -101,13 +83,15 @@ export default function Profile({ onSignup }) {
   // handles resgister form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // updateProfile(values.data)
+
     const errors = validate();
+
     setValues({ ...values, errors: errors || {} });
+
     if (errors) return;
-    // Call the server...
-    updateProfile(values.data);
+    resetPassword();
     history.push('/');
+    // Call the server...
   };
 
   // To Validate single input field
@@ -135,22 +119,26 @@ export default function Profile({ onSignup }) {
   };
 
   // Toggles password confirm visibility
+  const handleClickShowConfirmPassword = () => {
+    setValues({ ...values, showConfirmPassword: !values.showConfirmPassword });
+  };
 
   return (
     <Card className={classes.card}>
       <CardContent>
         <Typography variant="h5" component="h2">
-          Profile
+          Reset Password
         </Typography>
         <form className={classes.form} noValidate autoComplete="off">
-          {/* First Name */}
+          {/* Password */}
           <FormControl>
-            {/* <InputLabel htmlFor="firstName">First Name</InputLabel> */}
+            <InputLabel htmlFor="password">Enter Code</InputLabel>
             <Input
-              id="firstName"
-              name="firstName"
-              error={!!values.errors.firstName}
-              value={values.data.firstName}
+              id="code"
+              name="code"
+              error={!!values.errors.password}
+              type={'text'}
+              // value={values.data.password}
               onChange={handleChange}
               aria-describedby="component-error-text"
             />
@@ -158,31 +146,13 @@ export default function Profile({ onSignup }) {
               className={classes.errorText}
               id="component-error-text"
             >
-              {values.errors.firstName}
-            </FormHelperText>
-          </FormControl>
-          {/* Last Name */}
-          <FormControl>
-            {/* <InputLabel htmlFor="lastName">Last Name</InputLabel> */}
-            <Input
-              id="lastName"
-              name="lastName"
-              error={!!values.errors.lastName}
-              value={values.data.lastName}
-              onChange={handleChange}
-              aria-describedby="component-error-text"
-            />
-            <FormHelperText
-              className={classes.errorText}
-              id="component-error-text"
-            >
-              {values.errors.lastName}
+              {values.errors.code}
             </FormHelperText>
           </FormControl>
 
           {/* Password */}
           <FormControl>
-            <InputLabel htmlFor="password">New Password</InputLabel>
+            <InputLabel htmlFor="password">Password</InputLabel>
             <Input
               id="password"
               name="password"
@@ -209,6 +179,41 @@ export default function Profile({ onSignup }) {
               {values.errors.password}
             </FormHelperText>
           </FormControl>
+
+          {/* Confirm Password */}
+          <FormControl>
+            <InputLabel htmlFor="confirmPassword">Confirm Password</InputLabel>
+            <Input
+              id="confirmPassword"
+              name="confirmPassword"
+              error={!!values.errors.confirmPassword}
+              type={values.showConfirmPassword ? 'text' : 'password'}
+              value={values.data.confirmPassword}
+              onChange={handleChange}
+              aria-describedby="component-error-text-cp"
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle confirmPassword visibility"
+                    onClick={handleClickShowConfirmPassword}
+                  >
+                    {values.showConfirmPassword ? (
+                      <Visibility />
+                    ) : (
+                      <VisibilityOff />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              }
+            />
+            <FormHelperText
+              className={classes.errorText}
+              id="component-error-text-cp"
+            >
+              {values.errors.confirmPassword}
+            </FormHelperText>
+          </FormControl>
+
           {/* Register Button */}
           <Button
             size="small"
@@ -219,7 +224,7 @@ export default function Profile({ onSignup }) {
               handleSubmit(e);
             }}
           >
-            Save Changes
+            Confirm
           </Button>
         </form>
       </CardContent>

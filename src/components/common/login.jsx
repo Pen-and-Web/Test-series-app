@@ -1,48 +1,52 @@
-import { login } from "./../../services/authService";
-import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
-import { makeStyles } from "@material-ui/core/styles";
-import IconButton from "@material-ui/core/IconButton";
-import Input from "@material-ui/core/Input";
-import InputLabel from "@material-ui/core/InputLabel";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import VisibilityOff from "@material-ui/icons/VisibilityOff";
-import Joi from "joi-browser";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import Button from "@material-ui/core/Button";
-import FormControl from "@material-ui/core/FormControl";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import Visibility from "@material-ui/icons/Visibility";
-import Typography from "@material-ui/core/Typography";
-import { useHistory } from "react-router";
-import { NavLink } from "react-router-dom";
-import { getUserLocalStorage } from "./../../services/authService";
+import { login } from './../../services/authService';
+import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { makeStyles } from '@material-ui/core/styles';
+import IconButton from '@material-ui/core/IconButton';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import VisibilityOff from '@material-ui/icons/VisibilityOff';
+import Joi from 'joi-browser';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button';
+import FormControl from '@material-ui/core/FormControl';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import Visibility from '@material-ui/icons/Visibility';
+import Typography from '@material-ui/core/Typography';
+import { useHistory } from 'react-router';
+import { NavLink } from 'react-router-dom';
+import { getUserLocalStorage } from './../../services/authService';
+import { forgetPassword } from './../../services/authService';
+import FacebookIcon from '@material-ui/icons/Facebook';
+import { FacebookLoginButton } from 'react-social-login-buttons';
+import { SocialIcon } from 'react-social-icons';
 
 const useStyles = makeStyles((theme) => ({
   card: {
     maxWidth: 400,
-    display: "flex",
-    flexDirection: "column",
-    margin: "auto",
-    marginTop: "5%",
+    display: 'flex',
+    flexDirection: 'column',
+    margin: 'auto',
+    marginTop: '5%',
   },
   form: {
-    "& > *": {
+    '& > *': {
       margin: theme.spacing(1),
-      width: "35ch",
+      width: '35ch',
     },
   },
   loginBtn: {
-    padding: "8px 0",
-    marginTop: "5%",
+    padding: '8px 0',
+    marginTop: '5%',
   },
   errorText: {
-    color: "#f44336",
+    color: '#f44336',
   },
   loginLink: {
-    color: "#fff",
-    textDecoration: "none",
+    color: '#fff',
+    textDecoration: 'none',
   },
 }));
 
@@ -50,7 +54,7 @@ export default function Login({ onLogin }) {
   const history = useHistory();
   useEffect(() => {
     if (getUserLocalStorage()) {
-      history.push("/");
+      history.push('/');
     }
   }, []);
 
@@ -58,8 +62,8 @@ export default function Login({ onLogin }) {
 
   const [values, setValues] = useState({
     data: {
-      password: "",
-      email: "",
+      password: '',
+      email: '',
     },
     showPassword: false,
     errors: {},
@@ -70,8 +74,8 @@ export default function Login({ onLogin }) {
     email: Joi.string()
       .required()
       .email({ minDomainSegments: 2 })
-      .label("Email"),
-    password: Joi.string().required().min(5).label("Password"),
+      .label('Email'),
+    password: Joi.string().required().min(5).label('Password'),
   };
 
   //   Validates entire form on form submit
@@ -99,18 +103,18 @@ export default function Login({ onLogin }) {
     try {
       // NOTE: change dto with values.data
       const dto = {
-        email: "john4@gmail.com",
-        password: "pass@123",
+        email: 'john4@gmail.com',
+        password: 'pass@123',
       };
       const res = await login(dto);
 
       if (res) {
         onLogin();
         // Redirect user to home page
-        history.push("/");
+        history.push('/');
       }
     } catch (ex) {
-      toast.error("Something went wrong ");
+      toast.error('Something went wrong ');
       console.log(ex);
     }
   };
@@ -173,7 +177,7 @@ export default function Login({ onLogin }) {
                 id="password"
                 name="password"
                 error={!!values.errors.password}
-                type={values.showPassword ? "text" : "password"}
+                type={values.showPassword ? 'text' : 'password'}
                 value={values.data.password}
                 onChange={handleChange}
                 aria-describedby="component-error-text"
@@ -209,7 +213,41 @@ export default function Login({ onLogin }) {
               Login
             </Button>
           </form>
-          <NavLink to="/">Forgot Password</NavLink>
+
+          <div>
+            <p style={{ fontSize: '0.8rem' }}>Login with social media</p>
+            {/* <p>Login with social media</p>
+            <FacebookIcon
+              style={{
+                width: '3rem',
+                height: '3rem',
+                marginBottom: '0.2rem',
+                cursor: 'pointer',
+              }}
+            /> */}
+            <SocialIcon
+              url="http://facebook.com/"
+              style={{
+                marginRight: '1rem',
+                marginBottom: '1rem',
+                width: '2rem',
+                height: '2rem',
+              }}
+            />
+            <SocialIcon
+              url="http://google.com/"
+              style={{ marginBottom: '1rem', width: '2rem', height: '2rem' }}
+            />
+          </div>
+          <NavLink
+            to="/resetpass"
+            onClick={() => {
+              forgetPassword();
+            }}
+            style={{ marginTop: '1rem' }}
+          >
+            Forgot Password
+          </NavLink>
         </CardContent>
       </Card>
     </div>

@@ -13,6 +13,7 @@ import Profile from './components/profile';
 import ProtectedRoute from './components/common/protectedRoute';
 import { getUserLocalStorage, logout } from './../src/services/authService';
 import Reset from './components/reset';
+import GetCode from './components/getCode';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -51,6 +52,7 @@ function App() {
         <Route path="/test" component={Test} />
         <Route path="/logout" component={Login} />
         <Route path="/profile" component={Profile} />
+        <Route path="/getCode" component={GetCode} />
       </Switch>
     </div>
   );

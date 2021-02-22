@@ -101,12 +101,17 @@ export default function Profile({ onSignup }) {
   // handles resgister form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+    updateProfile(values.data);
     // updateProfile(values.data)
     const errors = validate();
+    console.log('====================================');
+    console.log(errors);
+    console.log('====================================');
     setValues({ ...values, errors: errors || {} });
+
     if (errors) return;
     // Call the server...
-    updateProfile(values.data);
+
     history.push('/');
   };
 

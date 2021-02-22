@@ -22,6 +22,9 @@ import { forgetPassword } from './../../services/authService';
 import FacebookIcon from '@material-ui/icons/Facebook';
 import { FacebookLoginButton } from 'react-social-login-buttons';
 import { SocialIcon } from 'react-social-icons';
+import axios from 'axios';
+
+import SocialButton from '../socialButtons';
 
 const useStyles = makeStyles((theme) => ({
   card: {
@@ -77,7 +80,55 @@ export default function Login({ onLogin }) {
       .label('Email'),
     password: Joi.string().required().min(5).label('Password'),
   };
+  const signup = (res) => {
+    const googleresponse = {
+      Name: res.profileObj.name,
 
+      email: res.profileObj.email,
+
+      token: res.googleId,
+
+      Image: res.profileObj.imageUrl,
+
+      ProviderId: 'Google',
+    };
+
+    debugger;
+
+    axios
+      .post('http://localhost:3100/api/auth/google/', googleresponse)
+
+      .then((result) => {
+        let responseJson = result;
+
+        // sessionStorage.setItem("userData", JSON.stringify(result));
+
+        history.push('/home');
+      });
+  };
+  const handleRequest = async () => {
+    console.log('request called');
+    let url = 'http://localhost:3100/api/auth/google';
+    try {
+      // const response = await axios.get(
+      //   `http://localhost:3100/api/auth/google`,withCr
+      // );
+      // console.log(response);
+      await axios({
+        method: 'get',
+        url,
+        withCredentials: true,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+        },
+      });
+    } catch (err) {
+      console.log('====================================');
+      console.log(err, 'error occured');
+      console.log('====================================');
+    }
+  };
   //   Validates entire form on form submit
   let validate = () => {
     const options = { abortEarly: false };
@@ -102,11 +153,11 @@ export default function Login({ onLogin }) {
 
     try {
       // NOTE: change dto with values.data
-      const dto = {
-        email: 'john4@gmail.com',
-        password: 'pass@123',
-      };
-      const res = await login(dto);
+      // const dto = {
+      //   email: 'john4@gmail.com',
+      //   password: 'pass@123',
+      // };
+      const res = await login(values.data);
 
       if (res) {
         onLogin();
@@ -141,6 +192,20 @@ export default function Login({ onLogin }) {
   // Toggles password visibility
   const handleClickShowPassword = () => {
     setValues({ ...values, showPassword: !values.showPassword });
+  };
+  const responseGoogle = (response) => {
+    console.log(response);
+    var res = response.profileObj;
+    console.log(res);
+    debugger;
+    signup(response);
+  };
+  const handleSocialLogin = (user) => {
+    console.log(user);
+  };
+
+  const handleSocialLoginFailure = (err) => {
+    console.error(err);
   };
 
   return (
@@ -232,20 +297,25 @@ export default function Login({ onLogin }) {
                 marginBottom: '1rem',
                 width: '2rem',
                 height: '2rem',
+                cursor: 'pointer',
               }}
+              // onClick={() => {
+              //   handleRequest();
+              // }}
             />
+            {/* <GoogleLogin
+              clientId="1090438885488-tbu9mo0t1jjhn2gkkrfsoat8aokhqeud.apps.googleusercontent.com"
+              buttonText="Login with Google"
+              onSuccess={responseGoogle()}
+              onFailure={responseGoogle()}
+            ></GoogleLogin> */}
+
             <SocialIcon
               url="http://google.com/"
               style={{ marginBottom: '1rem', width: '2rem', height: '2rem' }}
             />
           </div>
-          <NavLink
-            to="/resetpass"
-            onClick={() => {
-              forgetPassword();
-            }}
-            style={{ marginTop: '1rem' }}
-          >
+          <NavLink to="/getCode" style={{ marginTop: '1rem' }}>
             Forgot Password
           </NavLink>
         </CardContent>

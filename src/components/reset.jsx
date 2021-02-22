@@ -52,6 +52,7 @@ export default function Reset() {
     data: {
       password: '',
       confirmPassword: '',
+      code: '',
     },
     showPassword: false,
     showConfirmPassword: false,
@@ -85,11 +86,11 @@ export default function Reset() {
     e.preventDefault();
 
     const errors = validate();
-
+    resetPassword(values.data);
     setValues({ ...values, errors: errors || {} });
 
     if (errors) return;
-    resetPassword();
+
     history.push('/');
     // Call the server...
   };

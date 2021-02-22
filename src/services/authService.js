@@ -1,7 +1,7 @@
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { useHistory } from 'react-router';
-export const apiUrl = 'http://192.168.18.17:3100/api';
+export const apiUrl = 'http://localhost:3100/api';
 
 // http://68.183.135.125:3100/api/auth/signup
 
@@ -53,23 +53,35 @@ export const updateProfile = async (obj) => {
   }
 };
 
-export const forgetPassword = async () => {
-  console.log('forget password called');
-  // try {
-  //   const res = await axios.get(`${apiUrl}/auth/forgotPassword`);
-  //   console.log(res, 'forgetPass response');
-  // } catch (err) {
-  //   console.log(err);
-  // }
+export const forgetPassword = async (data) => {
+  console.log(data, 'forget password called');
+  // const res = await getUserLocalStorage();
+  // console.log(res, 'forgot local');
+  const obj = {
+    email: 'oosammach@gmail.com',
+  };
+  try {
+    const res = await axios.post(`${apiUrl}/auth/forgotPassword`, obj);
+    console.log(res, 'forgetPass response');
+  } catch (err) {
+    console.log(err);
+  }
 };
-export const resetPassword = async () => {
-  console.log('reset password called');
-  // try {
-  //   const res = await axios.get(`${apiUrl}/auth/resetPassword`);
-  //   console.log(res, 'resetPass response');
-  // } catch (err) {
-  //   console.log(err);
-  // }
+export const resetPassword = async (data) => {
+  // console.log(data, 'reset password called');
+  const obj = {
+    resetCode: data.code,
+    passwordConfirm: data.confirmPassword,
+    password: data.password,
+  };
+  console.log(obj, 'object created');
+
+  try {
+    const res = await axios.post(`${apiUrl}/auth/resetPassword`, obj);
+    console.log(res, 'resetPass response');
+  } catch (err) {
+    console.log(err);
+  }
 };
 export const logout = async () => {
   try {

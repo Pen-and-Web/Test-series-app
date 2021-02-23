@@ -1,48 +1,46 @@
-import React, { useEffect } from 'react';
-import { toast } from 'react-toastify';
-import { useHistory } from 'react-router';
-import { makeStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import Joi from 'joi-browser';
-import FormControl from '@material-ui/core/FormControl';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import Visibility from '@material-ui/icons/Visibility';
-import Typography from '@material-ui/core/Typography';
-import { updateProfile } from '../services/authService';
-import axios from 'axios';
-import { apiUrl } from '../services/authService';
-import { getUserLocalStorage } from '../services/authService';
+import React from "react";
+import { useHistory } from "react-router";
+import { makeStyles } from "@material-ui/core/styles";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import Input from "@material-ui/core/Input";
+import InputLabel from "@material-ui/core/InputLabel";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import VisibilityOff from "@material-ui/icons/VisibilityOff";
+import Joi from "joi-browser";
+import FormControl from "@material-ui/core/FormControl";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import Visibility from "@material-ui/icons/Visibility";
+import Typography from "@material-ui/core/Typography";
+import { updateProfile } from "../services/authService";
+
+import { getUserLocalStorage } from "../services/authService";
 const useStyles = makeStyles((theme) => ({
   card: {
     maxWidth: 400,
-    display: 'flex',
-    flexDirection: 'column',
-    margin: 'auto',
-    marginTop: '5%',
+    display: "flex",
+    flexDirection: "column",
+    margin: "auto",
+    marginTop: "5%",
   },
   form: {
-    '& > *': {
+    "& > *": {
       margin: theme.spacing(1),
-      width: '35ch',
+      width: "35ch",
     },
   },
   registerBtn: {
-    padding: '8px 0',
-    marginTop: '5%',
+    padding: "8px 0",
+    marginTop: "5%",
   },
   errorText: {
-    color: '#f44336',
+    color: "#f44336",
   },
   registerLink: {
-    color: '#fff',
-    textDecoration: 'none',
+    color: "#fff",
+    textDecoration: "none",
   },
 }));
 
@@ -50,9 +48,9 @@ export default function Profile({ onSignup }) {
   const classes = useStyles();
   const [values, setValues] = React.useState({
     data: {
-      firstName: '',
-      lastName: '',
-      password: '',
+      firstName: "",
+      lastName: "",
+      password: "",
     },
     showPassword: false,
     errors: {},
@@ -77,9 +75,9 @@ export default function Profile({ onSignup }) {
     fetchProfileData();
   }, []);
   const registerSchema = {
-    firstName: Joi.string().required().min(3).label('First Name'),
-    lastName: Joi.string().required().min(3).label('Last Name'),
-    password: Joi.string().required().min(5).label('Password'),
+    firstName: Joi.string().required().min(3).label("First Name"),
+    lastName: Joi.string().required().min(3).label("Last Name"),
+    password: Joi.string().required().min(5).label("Password"),
   };
 
   let validate = () => {
@@ -104,15 +102,15 @@ export default function Profile({ onSignup }) {
     updateProfile(values.data);
     // updateProfile(values.data)
     const errors = validate();
-    console.log('====================================');
+    console.log("====================================");
     console.log(errors);
-    console.log('====================================');
+    console.log("====================================");
     setValues({ ...values, errors: errors || {} });
 
     if (errors) return;
     // Call the server...
 
-    history.push('/');
+    history.push("/");
   };
 
   // To Validate single input field
@@ -192,7 +190,7 @@ export default function Profile({ onSignup }) {
               id="password"
               name="password"
               error={!!values.errors.password}
-              type={values.showPassword ? 'text' : 'password'}
+              type={values.showPassword ? "text" : "password"}
               value={values.data.password}
               onChange={handleChange}
               aria-describedby="component-error-text"

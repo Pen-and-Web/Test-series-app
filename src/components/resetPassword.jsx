@@ -1,58 +1,57 @@
-import React, { useEffect } from 'react';
-import { toast } from 'react-toastify';
-import { useHistory } from 'react-router';
-import { makeStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import Joi from 'joi-browser';
-import FormControl from '@material-ui/core/FormControl';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import Visibility from '@material-ui/icons/Visibility';
-import Typography from '@material-ui/core/Typography';
-import { resetPassword } from './../services/authService';
+import React from "react";
+import { useHistory } from "react-router";
+import { makeStyles } from "@material-ui/core/styles";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import Input from "@material-ui/core/Input";
+import InputLabel from "@material-ui/core/InputLabel";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import VisibilityOff from "@material-ui/icons/VisibilityOff";
+import Joi from "joi-browser";
+import FormControl from "@material-ui/core/FormControl";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import Visibility from "@material-ui/icons/Visibility";
+import Typography from "@material-ui/core/Typography";
+import { resetPassword } from "../services/authService";
 
 const useStyles = makeStyles((theme) => ({
   card: {
     maxWidth: 400,
-    display: 'flex',
-    flexDirection: 'column',
-    margin: 'auto',
-    marginTop: '5%',
+    display: "flex",
+    flexDirection: "column",
+    margin: "auto",
+    marginTop: "5%",
   },
   form: {
-    '& > *': {
+    "& > *": {
       margin: theme.spacing(1),
-      width: '35ch',
+      width: "35ch",
     },
   },
   registerBtn: {
-    padding: '8px 0',
-    marginTop: '5%',
+    padding: "8px 0",
+    marginTop: "5%",
   },
   errorText: {
-    color: '#f44336',
+    color: "#f44336",
   },
   registerLink: {
-    color: '#fff',
-    textDecoration: 'none',
+    color: "#fff",
+    textDecoration: "none",
   },
 }));
 
-export default function Reset() {
+export default function ResetPassword() {
   const history = useHistory();
   const classes = useStyles();
 
   const [values, setValues] = React.useState({
     data: {
-      password: '',
-      confirmPassword: '',
-      code: '',
+      password: "",
+      confirmPassword: "",
+      code: "",
     },
     showPassword: false,
     showConfirmPassword: false,
@@ -60,9 +59,9 @@ export default function Reset() {
   });
 
   const registerSchema = {
-    code: Joi.string().required().min(6).label('Code'),
-    password: Joi.string().required().min(5).label('Password'),
-    confirmPassword: Joi.string().required().min(5).label('Confirm Password'),
+    code: Joi.string().required().min(6).label("Code"),
+    password: Joi.string().required().min(5).label("Password"),
+    confirmPassword: Joi.string().required().min(5).label("Confirm Password"),
   };
 
   let validate = () => {
@@ -91,7 +90,7 @@ export default function Reset() {
 
     if (errors) return;
 
-    history.push('/');
+    history.push("/");
     // Call the server...
   };
 
@@ -138,7 +137,7 @@ export default function Reset() {
               id="code"
               name="code"
               error={!!values.errors.password}
-              type={'text'}
+              type={"text"}
               // value={values.data.password}
               onChange={handleChange}
               aria-describedby="component-error-text"
@@ -158,7 +157,7 @@ export default function Reset() {
               id="password"
               name="password"
               error={!!values.errors.password}
-              type={values.showPassword ? 'text' : 'password'}
+              type={values.showPassword ? "text" : "password"}
               value={values.data.password}
               onChange={handleChange}
               aria-describedby="component-error-text"
@@ -188,7 +187,7 @@ export default function Reset() {
               id="confirmPassword"
               name="confirmPassword"
               error={!!values.errors.confirmPassword}
-              type={values.showConfirmPassword ? 'text' : 'password'}
+              type={values.showConfirmPassword ? "text" : "password"}
               value={values.data.confirmPassword}
               onChange={handleChange}
               aria-describedby="component-error-text-cp"

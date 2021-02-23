@@ -1,61 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import { makeStyles } from '@material-ui/core/styles';
-import IconButton from '@material-ui/core/IconButton';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import Joi from 'joi-browser';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import Button from '@material-ui/core/Button';
-import FormControl from '@material-ui/core/FormControl';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import Visibility from '@material-ui/icons/Visibility';
-import Typography from '@material-ui/core/Typography';
-import { useHistory } from 'react-router';
-import { NavLink } from 'react-router-dom';
-import FacebookIcon from '@material-ui/icons/Facebook';
-import { FacebookLoginButton } from 'react-social-login-buttons';
-import { SocialIcon } from 'react-social-icons';
-import { forgetPassword } from './../services/authService';
+import React, { useState, useEffect } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import Input from "@material-ui/core/Input";
+import InputLabel from "@material-ui/core/InputLabel";
+import Joi from "joi-browser";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import Button from "@material-ui/core/Button";
+import FormControl from "@material-ui/core/FormControl";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import Typography from "@material-ui/core/Typography";
+import { useHistory } from "react-router";
+import { forgetPassword } from "../services/authService";
 
 const useStyles = makeStyles((theme) => ({
   card: {
     maxWidth: 400,
-    display: 'flex',
-    flexDirection: 'column',
-    margin: 'auto',
-    marginTop: '5%',
+    display: "flex",
+    flexDirection: "column",
+    margin: "auto",
+    marginTop: "5%",
   },
   form: {
-    '& > *': {
+    "& > *": {
       margin: theme.spacing(1),
-      width: '35ch',
+      width: "35ch",
     },
   },
   loginBtn: {
-    padding: '8px 0',
-    marginTop: '5%',
+    padding: "8px 0",
+    marginTop: "5%",
   },
   errorText: {
-    color: '#f44336',
+    color: "#f44336",
   },
   loginLink: {
-    color: '#fff',
-    textDecoration: 'none',
+    color: "#fff",
+    textDecoration: "none",
   },
 }));
 
-export default function GetCode({ onLogin }) {
+export default function ForgotPassword() {
   const history = useHistory();
 
   const classes = useStyles();
 
   const [values, setValues] = useState({
     data: {
-      email: '',
+      email: "",
     },
     showPassword: false,
     errors: {},
@@ -66,7 +57,7 @@ export default function GetCode({ onLogin }) {
     email: Joi.string()
       .required()
       .email({ minDomainSegments: 2 })
-      .label('Email'),
+      .label("Email"),
   };
 
   //   Validates entire form on form submit
@@ -88,9 +79,7 @@ export default function GetCode({ onLogin }) {
     const errors = validate();
     setValues({ ...values, errors: errors || {} });
     if (errors) return;
-    forgetPassword(values.data);
-    history.push('/resetpass');
-    // Login user here...
+    if (await forgetPassword(values.data)) history.push("/resetPassword");
   };
 
   // validates single property
@@ -112,17 +101,12 @@ export default function GetCode({ onLogin }) {
     setValues({ ...values, data, errors });
   };
 
-  // Toggles password visibility
-  const handleClickShowPassword = () => {
-    setValues({ ...values, showPassword: !values.showPassword });
-  };
-
   return (
     <div className={classes.root}>
       <Card className={classes.card}>
         <CardContent>
           <Typography variant="h5" component="h2">
-            Reset Password
+            Enter Your Email
           </Typography>
           <form className={classes.form} noValidate autoComplete="off">
             {/* Email */}
@@ -144,7 +128,7 @@ export default function GetCode({ onLogin }) {
               </FormHelperText>
             </FormControl>
 
-            {/* Login button */}
+            {/* Submit button */}
             <Button
               size="small"
               className={classes.loginBtn}
@@ -157,16 +141,6 @@ export default function GetCode({ onLogin }) {
               send code
             </Button>
           </form>
-
-          {/* <NavLink
-            to="/resetpass"
-            onClick={() => {
-              forgetPassword();
-            }}
-            style={{ marginTop: '1rem' }}
-          >
-            Forgot Password
-          </NavLink> */}
         </CardContent>
       </Card>
     </div>

@@ -9,7 +9,7 @@ export const signup = async (dto) => {
   try {
     const res = await axios.post(`${apiUrl}/auth/signup`, dto);
     if (res.status === 200) {
-      toast.error("Signup successfull");
+      toast.info("Signup successfull");
       return true;
     }
   } catch (ex) {
@@ -44,12 +44,21 @@ export const login = async (user) => {
   }
 };
 
-export const updateProfile = async (obj) => {
+export const updateProfile = async (profileData) => {
   try {
-    const res = await axios.put(`${apiUrl}/auth/updateMe`, obj);
-    console.log(res, "response");
+    const res = await axios.put(`${apiUrl}/auth/updateMe`, profileData);
+
+    if (res.status === 200) {
+      toast.info("Profile updated successfully");
+
+      setUserLocalStorage(res.data.user);
+      return true;
+    }
   } catch (err) {
-    console.log(err, "error");
+    toast.error(
+      "There was an error updating profile, please try again later. "
+    );
+    return false;
   }
 };
 
@@ -62,24 +71,34 @@ export const forgetPassword = async (data) => {
     }
   } catch (err) {
     console.log(err);
+    if (err.response.status === 404) {
+      toast.error("No user registered with provided Email");
+      return false;
+    }
     toast.error("There was an error in sending Email");
     return false;
   }
 };
 export const resetPassword = async (data) => {
-  // console.log(data, 'reset password called');
-  const obj = {
+  const dto = {
     resetCode: data.code,
     passwordConfirm: data.confirmPassword,
     password: data.password,
   };
-  console.log(obj, "object created");
 
   try {
-    const res = await axios.post(`${apiUrl}/auth/resetPassword`, obj);
-    console.log(res, "resetPass response");
+    const res = await axios.post(`${apiUrl}/auth/resetPassword`, dto);
+
+    if (res.status === 200) {
+      toast.info(res.data.message);
+      return true;
+    }
   } catch (err) {
     console.log(err);
+    if (err.response.status === 400) {
+      toast.error(err.response.data.message);
+    }
+    return false;
   }
 };
 export const logout = async () => {
@@ -89,7 +108,6 @@ export const logout = async () => {
     window.location = "/";
     return true;
   } catch (err) {
-    console.log(err);
     return false;
   }
 };
@@ -97,12 +115,26 @@ export const logout = async () => {
 export const getCurrentUserApi = async () => {
   try {
     const res = await axios.get(`${apiUrl}/auth/me`);
-    const { firstName, lastName, email } = res.data;
+    if (res.data.provider === "facebook") {
+      var {
+        email,
+        first_name: firstName,
+        last_name: lastName,
+      } = res.data._json;
+    }
+    if (res.data.provider === "google") {
+      var {
+        email,
+        given_name: firstName,
+        family_name: lastName,
+      } = res.data._json;
+    }
+
     if (firstName && lastName && email)
       setUserLocalStorage({ firstName, lastName, email });
-    return res.data;
+    return { firstName, lastName, email };
   } catch (err) {
-    console.log(err);
+    // console.log(err.response);
     return null;
   }
 };

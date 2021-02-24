@@ -1,6 +1,5 @@
 import "./App.css";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Route, Switch, Redirect } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,6 +13,7 @@ import ProtectedRoute from "./components/common/protectedRoute";
 import {
   getUserLocalStorage,
   logout,
+  getCurrentUserApi,
   setUserLocalStorage,
 } from "./../src/services/authService";
 import ResetPassword from "./components/resetPassword";
@@ -23,14 +23,16 @@ function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    function getUser() {
-      axios.get("http://localhost:3100/api/auth/me").then(({ data }) => {
-        setUserLocalStorage(data);
-        setUser(data);
-      });
+    if (getUserLocalStorage()) {
+      setCurrentUser();
+    } else {
+      getUserFromServer();
     }
-    getUser();
-    setCurrentUser();
+    async function getUserFromServer() {
+      const data = await getCurrentUserApi();
+      setUserLocalStorage(data);
+      setUser(data);
+    }
   }, []);
 
   const handleLogout = () => {

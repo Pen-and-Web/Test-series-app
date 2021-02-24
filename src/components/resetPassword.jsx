@@ -67,17 +67,22 @@ export default function ResetPassword() {
   let validate = () => {
     const options = { abortEarly: false };
 
+    const errors = {};
+    if (values.data.password !== values.data.confirmPassword)
+      errors.password = "Password and Confirm Password must be same";
     const { error } = Joi.validate(values.data, registerSchema, options);
 
-    const errors = {};
+    if (error) {
+      error.details.forEach((error) => {
+        errors[error.path[0]] = error.message;
+      });
+      return errors;
+    }
 
-    if (!error) return null;
-
-    error.details.forEach((error) => {
-      errors[error.path[0]] = error.message;
-    });
-
-    return errors;
+    if (errors.password) {
+      return errors;
+    }
+    return null;
   };
 
   // handles resgister form submit
@@ -85,13 +90,13 @@ export default function ResetPassword() {
     e.preventDefault();
 
     const errors = validate();
-    resetPassword(values.data);
     setValues({ ...values, errors: errors || {} });
 
     if (errors) return;
-
-    history.push("/");
     // Call the server...
+    if (await resetPassword(values.data)) {
+      history.push("/");
+    }
   };
 
   // To Validate single input field

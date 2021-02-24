@@ -15,6 +15,7 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import Visibility from "@material-ui/icons/Visibility";
 import Typography from "@material-ui/core/Typography";
 import { updateProfile } from "../services/authService";
+import { toast } from "react-toastify";
 
 import { getUserLocalStorage } from "../services/authService";
 const useStyles = makeStyles((theme) => ({
@@ -51,39 +52,45 @@ export default function Profile({ onSignup }) {
       firstName: "",
       lastName: "",
       password: "",
+      email: "",
     },
     showPassword: false,
     errors: {},
   });
+
   const history = useHistory();
-
-  const fetchProfileData = async () => {
-    try {
-      const res = await getUserLocalStorage();
-      const { data } = values;
-      console.log(res);
-      data.firstName = res.firstName;
-      data.lastName = res.lastName;
-
-      setValues({ ...values, data });
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   React.useEffect(() => {
     fetchProfileData();
   }, []);
-  const registerSchema = {
+
+  const fetchProfileData = () => {
+    const userData = getUserLocalStorage();
+    if (userData) {
+      const { data } = values;
+      data.firstName = userData.firstName;
+      data.lastName = userData.lastName;
+      data.email = userData.email;
+
+      setValues({ ...values, data });
+    } else {
+      toast.error(
+        "There was an Error fetching users data please try again later"
+      );
+    }
+  };
+
+  const updateProfileSchema = {
     firstName: Joi.string().required().min(3).label("First Name"),
     lastName: Joi.string().required().min(3).label("Last Name"),
     password: Joi.string().required().min(5).label("Password"),
+    email: Joi.string().required().min(5).label("Email"),
   };
 
   let validate = () => {
     const options = { abortEarly: false };
 
-    const { error } = Joi.validate(values.data, registerSchema, options);
+    const { error } = Joi.validate(values.data, updateProfileSchema, options);
 
     const errors = {};
 
@@ -99,23 +106,21 @@ export default function Profile({ onSignup }) {
   // handles resgister form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    updateProfile(values.data);
-    // updateProfile(values.data)
+
     const errors = validate();
-    console.log("====================================");
-    console.log(errors);
-    console.log("====================================");
+
     setValues({ ...values, errors: errors || {} });
 
     if (errors) return;
-    // Call the server...
 
-    history.push("/");
+    if (await updateProfile(values.data)) {
+      history.push("/");
+    }
   };
 
   // To Validate single input field
   const validateProperty = ({ name, value }) => {
-    const schema = { [name]: registerSchema[name] };
+    const schema = { [name]: updateProfileSchema[name] };
     const obj = { [name]: value };
     const { error } = Joi.validate(obj, schema);
     return error ? error.details[0].message : null;
@@ -148,7 +153,7 @@ export default function Profile({ onSignup }) {
         <form className={classes.form} noValidate autoComplete="off">
           {/* First Name */}
           <FormControl>
-            {/* <InputLabel htmlFor="firstName">First Name</InputLabel> */}
+            <InputLabel htmlFor="firstName">First Name</InputLabel>
             <Input
               id="firstName"
               name="firstName"
@@ -166,7 +171,7 @@ export default function Profile({ onSignup }) {
           </FormControl>
           {/* Last Name */}
           <FormControl>
-            {/* <InputLabel htmlFor="lastName">Last Name</InputLabel> */}
+            <InputLabel htmlFor="lastName">Last Name</InputLabel>
             <Input
               id="lastName"
               name="lastName"

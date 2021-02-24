@@ -112,17 +112,13 @@ export default function Register({ onSignup }) {
       let { confirmPassword, ...dto } = values.data;
       dto.passwordConfirm = confirmPassword;
 
-      // dto = {
-      //   firstName: "john",
-      //   lastName: "doe",
-      //   email: "john20@gmail.com",
-      //   password: "pass@123",
-      //   passwordConfirm: "pass@123",
-      // };
-
       const res = await signup(dto);
       if (res) {
-        setUserLocalStorage({ firstName: dto.firstName, email: dto.email });
+        setUserLocalStorage({
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+          email: dto.email,
+        });
 
         onSignup();
         history.push("/");

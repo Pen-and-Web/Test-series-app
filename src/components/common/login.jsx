@@ -23,8 +23,6 @@ import { FaFacebook } from "react-icons/fa";
 
 import { getCurrentUserApi } from "./../../services/authService";
 
-import axios from "axios";
-
 const useStyles = makeStyles((theme) => ({
   card: {
     maxWidth: 400,
@@ -93,15 +91,6 @@ export default function Login({ onLogin }) {
       .email({ minDomainSegments: 2 })
       .label("Email"),
     password: Joi.string().required().min(5).label("Password"),
-  };
-
-  const handleFacebookLogin = async () => {
-    const res = await axios.get("http://localhost:3100/api/auth/facebook");
-    console.log(res);
-  };
-  const handleGoogleLogin = async () => {
-    const res = await axios.get("http://localhost:3100/api/auth/google");
-    console.log(res);
   };
 
   //   Validates entire form on form submit
